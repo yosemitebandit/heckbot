@@ -45,7 +45,7 @@ class Player(object):
     self.is_me = False
 
   def __repr__(self):
-    return 'Player: is_leader: %s, is_me: %s, hand: %s\n' % (
+    return 'Player: is_leader: %s, is_me: %s, hand: %s' % (
       self.is_leader, self.is_me, self.hand)
 
 
@@ -72,6 +72,10 @@ while True:
       card_index += 1
   # Setup my hand.
   players[-1].hand = list(my_cards)
+
+  # for p in players:
+    # print p
+  # raw_input()
 
   # Play through all the tricks in the round.
   my_tricks_won = 0
@@ -103,6 +107,8 @@ while True:
           trick[current_player_index] = current_player.hand.pop()
       current_player_index = (current_player_index + 1) % number_of_players
     winner_index = util.evaluate_trick(trick, leader_index, trump_suit)
+    # print leader_index, trick, winner_index
+    # raw_input()
     # Tally wins
     if players[winner_index].is_me:
       my_tricks_won += 1
@@ -117,8 +123,9 @@ while True:
   if iterations % 100 == 0:
     current_average_tricks_won = float(total_tricks_won) / iterations
     delta =  abs(previous_average_tricks_won - current_average_tricks_won)
-    if delta < 1e-3:
+    if delta < 1e-4:
       break
     previous_average_tricks_won = float(total_tricks_won) / iterations
 
 print 'recommended bid: %0.5f' % current_average_tricks_won
+print 'rounds simulated: %s' % iterations
