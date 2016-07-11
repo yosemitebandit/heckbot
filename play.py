@@ -39,6 +39,24 @@ for card in deck:
     remaining_deck.append(card)
 
 
+class Player(object):
+  def __init__(self):
+    self.hand = []
+    self.is_leader = False
+    self.is_me = False
+
+  def __repr__(self):
+    return 'Player: is_leader:%s, is_me:%s\n' % (self.is_leader, self.is_me)
+
+
+players = [Player() for _ in range(number_of_players)]
+players[-1].is_me = True
+my_index = number_of_players - 1
+leader_index = my_index - my_distance_from_leader
+players[leader_index].is_leader = True
+
+
+
 # Simulate random rounds until the average of won tricks converges.
 iterations, total_tricks_won, previous_average_tricks_won = 0, 0, 0
 while True:
