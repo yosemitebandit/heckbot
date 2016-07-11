@@ -8,11 +8,13 @@ Usage:
 Todo:
  * don't play randomly :|
  * follow the lead
- * adjust who leads
+ * multi-deck
 """
 
 import random
 import sys
+
+import util
 
 
 # Take the input params.
@@ -30,9 +32,7 @@ trump_suit = trump_card[-1]
 
 
 # Build the rest of the deck.
-all_values = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
-all_suits = ('C', 'S', 'D', 'H')
-deck = [v + s for v in all_values for s in all_suits]
+deck = util.build_full_deck()
 remaining_deck = []
 for card in deck:
   if card not in my_cards and card != trump_card:
@@ -46,9 +46,11 @@ class Player(object):
     self.is_me = False
 
   def __repr__(self):
-    return 'Player: is_leader:%s, is_me:%s\n' % (self.is_leader, self.is_me)
+    return 'Player: is_leader: %s, is_me: %s, hand: %s\n' % (
+      self.is_leader, self.is_me, self.hand)
 
 
+# Set the initial leader.
 players = [Player() for _ in range(number_of_players)]
 players[-1].is_me = True
 my_index = number_of_players - 1
@@ -56,53 +58,45 @@ leader_index = my_index - my_distance_from_leader
 players[leader_index].is_leader = True
 
 
-
 # Simulate random rounds until the average of won tricks converges.
 iterations, total_tricks_won, previous_average_tricks_won = 0, 0, 0
 while True:
   # Deal to the other players.
   random.shuffle(remaining_deck)
-  hands = []
-  for player_index in range(number_of_players - 1):
-    start_index = player_index * len(my_cards)
-    end_index = (player_index + 1) * len(my_cards)
-    hands.append([c for c in remaining_deck[start_index:end_index]])
+  card_index = 0
+  for i in range(len(my_cards)):
+    for player in players:
+      if player.is_me:
+        continue
+      next_card = remaining_deck[card_index]
+      player.hand.append(next_card)
+      card_index += 1
+  # Setup my hand.
+  players[-1].hand = list(my_cards)
 
-  # Setup each trick.
+  # Play through all the tricks in the round.
   my_tricks_won = 0
-  for hand_index, my_card in enumerate(my_cards):
-    trick = []
-    next_opposing_player = 0
-    for player_index in range(number_of_players):
-      if player_index == my_distance_from_leader:
-        trick.append(my_card)
-      else:
-        trick.append(hands[next_opposing_player][hand_index])
-        next_opposing_player += 1
-
-    # Determine who wins the trick.
-    trump_cards = [card for card in trick if trump_suit in card]
-    if len(trump_cards) == 1:
-      winning_card = trump_cards[0]
-    elif len(trump_cards) > 1:
-      trump_values = [c[:-1] for c in trump_cards]
-      indices = [all_values.index(v) for v in trump_values]
-      sorted_cards = sorted(zip(trump_values, indices), key=lambda v: v[1])
-      winning_value = sorted_cards[-1][0]
-      winning_card = (winning_value + trump_suit).upper()
-    else:
-      suit_lead = trick[0][-1]
-      suited_cards = [card for card in trick if suit_lead in card]
-      if len(suited_cards) == 1:
-        winning_card = suited_cards[0]
-      else:
-        suited_values = [c[:-1] for c in suited_cards]
-        indices = [all_values.index(v) for v in suited_values]
-        sorted_cards = sorted(zip(suited_values, indices), key=lambda v: v[1])
-        winning_value = sorted_cards[-1][0]
-        winning_card = (winning_value + suit_lead).upper()
-    if my_distance_from_leader == trick.index(winning_card):
+  for trick_index in range(len(my_cards)):
+    # Find the leader.
+    for i, p in enumerate(players):
+      if p.is_leader:
+        current_player_index = i
+        leader_index = i
+        break
+    # Setup the trick.
+    trick = [None for _ in range(number_of_players)]
+    for _ in range(number_of_players):
+      current_player = players[current_player_index]
+      trick[current_player_index] = players[current_player_index].hand.pop()
+      current_player_index = (current_player_index + 1) % number_of_players
+    winner_index = util.evaluate_trick(trick, leader_index, trump_suit)
+    # Tally wins
+    if players[winner_index].is_me:
       my_tricks_won += 1
+    # Set the new leader.
+    for p in players:
+      p.is_leader = False
+    players[winner_index].is_leader = True
 
   # Tally all the tricks won so far and take the average.
   total_tricks_won += my_tricks_won
@@ -110,7 +104,7 @@ while True:
   if iterations % 100 == 0:
     current_average_tricks_won = float(total_tricks_won) / iterations
     delta =  abs(previous_average_tricks_won - current_average_tricks_won)
-    if delta < 1e-5:
+    if delta < 1e-3:
       break
     previous_average_tricks_won = float(total_tricks_won) / iterations
 
