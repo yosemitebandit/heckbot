@@ -2,6 +2,8 @@
 
 Usage:
   python play.py
+  python play.py <number_of_players> <my_cards> <trump_card>
+                 <distance_from_leader>
 
 Todo:
  * don't play randomly :|
@@ -14,14 +16,20 @@ import sys
 
 
 # Take the input params.
-number_of_players = int(raw_input('number of players?\n'))
-my_cards = [c.upper() for c in raw_input('your cards?\n').split(' ')]
-trump_card = raw_input('trump card?\n').upper()
+if len(sys.argv) == 5:
+  number_of_players = int(sys.argv[1])
+  my_cards = [c.upper() for c in sys.argv[2].split(' ')]
+  trump_card = sys.argv[3].upper()
+  my_distance_from_leader = int(sys.argv[4])
+else:
+  number_of_players = int(raw_input('number of players?\n'))
+  my_cards = [c.upper() for c in raw_input('your cards?\n').split(' ')]
+  trump_card = raw_input('trump card?\n').upper()
+  my_distance_from_leader = int(raw_input('distance from leader?\n'))
 trump_suit = trump_card[-1]
-my_distance_from_leader = int(raw_input('distance from leader?\n'))
 
 
-# Shuffle the deck.
+# Build the rest of the deck.
 all_values = ('2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A')
 all_suits = ('C', 'S', 'D', 'H')
 deck = [v + s for v in all_values for s in all_suits]
@@ -31,7 +39,7 @@ for card in deck:
     remaining_deck.append(card)
 
 
-# Simulate random rounds.
+# Simulate random rounds until the average of won tricks converges.
 iterations, total_tricks_won, previous_average_tricks_won = 0, 0, 0
 while True:
   # Deal to the other players.
@@ -78,14 +86,14 @@ while True:
     if my_distance_from_leader == trick.index(winning_card):
       my_tricks_won += 1
 
-  # Tally all the tricks won so far and the average.
+  # Tally all the tricks won so far and take the average.
   total_tricks_won += my_tricks_won
   iterations += 1
   if iterations % 100 == 0:
     current_average_tricks_won = float(total_tricks_won) / iterations
     delta =  abs(previous_average_tricks_won - current_average_tricks_won)
-    if delta < 1e-6:
+    if delta < 1e-5:
       break
     previous_average_tricks_won = float(total_tricks_won) / iterations
 
-print 'estimated tricks you will take: %0.4f' % current_average_tricks_won
+print 'recommended bid: %0.5f' % current_average_tricks_won
