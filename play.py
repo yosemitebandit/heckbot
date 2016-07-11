@@ -7,7 +7,6 @@ Usage:
 
 Todo:
  * don't play randomly :|
- * follow the lead
  * multi-deck
 """
 
@@ -87,7 +86,21 @@ while True:
     trick = [None for _ in range(number_of_players)]
     for _ in range(number_of_players):
       current_player = players[current_player_index]
-      trick[current_player_index] = players[current_player_index].hand.pop()
+      if not any(trick):
+        # Play the lead card.
+        trick[current_player_index] = current_player.hand.pop()
+      else:
+        # Play the other cards, following suit if possible.
+        suit_lead = trick[leader_index][-1]
+        suited_cards = [card for card in current_player.hand
+                        if suit_lead in card]
+        if suited_cards:
+          card_to_play = suited_cards[0]
+          index = current_player.hand.index(card_to_play)
+          current_player.hand.pop(index)
+          trick[current_player_index] = card_to_play
+        else:
+          trick[current_player_index] = current_player.hand.pop()
       current_player_index = (current_player_index + 1) % number_of_players
     winner_index = util.evaluate_trick(trick, leader_index, trump_suit)
     # Tally wins
