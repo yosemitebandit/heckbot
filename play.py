@@ -7,6 +7,7 @@ Usage:
 
 Todo:
  * don't play randomly :|
+ * remember first hand has no trump
  * multi-deck
 """
 
