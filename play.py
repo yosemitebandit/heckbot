@@ -41,12 +41,10 @@ for card in deck:
 class Player(object):
   def __init__(self):
     self.hand = []
-    self.is_leader = False
     self.is_me = False
 
   def __repr__(self):
-    return 'Player: is_leader: %s, is_me: %s, hand: %s' % (
-      self.is_leader, self.is_me, self.hand)
+    return 'Player: is_me: %s, hand: %s' % (self.is_me, self.hand)
 
 
 # Set the initial leader.
@@ -54,7 +52,6 @@ players = [Player() for _ in range(number_of_players)]
 players[-1].is_me = True
 my_index = number_of_players - 1
 leader_index = my_index - my_distance_from_leader
-players[leader_index].is_leader = True
 
 
 # Simulate random rounds until the average of won tricks converges.
@@ -79,13 +76,9 @@ while True:
 
   # Play through all the tricks in the round.
   my_tricks_won = 0
-  for trick_index in range(len(my_cards)):
+  for _ in range(len(my_cards)):
     # Find the leader.
-    for i, p in enumerate(players):
-      if p.is_leader:
-        current_player_index = i
-        leader_index = i
-        break
+    current_player_index = leader_index
     # Setup the trick.
     trick = [None for _ in range(number_of_players)]
     for _ in range(number_of_players):
@@ -113,9 +106,7 @@ while True:
     if players[winner_index].is_me:
       my_tricks_won += 1
     # Set the new leader.
-    for p in players:
-      p.is_leader = False
-    players[winner_index].is_leader = True
+    leader_index = winner_index
 
   # Tally all the tricks won so far and take the average.
   total_tricks_won += my_tricks_won
@@ -123,7 +114,7 @@ while True:
   if iterations % 100 == 0:
     current_average_tricks_won = float(total_tricks_won) / iterations
     delta =  abs(previous_average_tricks_won - current_average_tricks_won)
-    if delta < 1e-4:
+    if delta < 1e-5:
       break
     previous_average_tricks_won = float(total_tricks_won) / iterations
 
