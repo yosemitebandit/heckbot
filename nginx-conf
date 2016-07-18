@@ -1,0 +1,13 @@
+# save this in /etc/nginx/sites-available/heckbot.oakmachine.com
+# link it to sites-enabled
+# and reload nginx
+
+server {
+    listen 80;
+    server_name heckbot.oakmachine.com;
+
+    location / {
+        include uwsgi_params;
+        uwsgi_pass unix:/tmp/heckbot-server.sock;
+    }
+}

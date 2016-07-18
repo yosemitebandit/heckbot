@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <style>
+      body, html {
+        width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      form {
+        margin-top: 40px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h4><code>heckbot</code></h4>
+    <p>
+      An "Oh-Hell" bid recommendor.
+    </p>
+
+    <form action="/" method=get>
+      <p>total number of players</p>
+      <p><input name='number-of-players'type='text'></p>
+
+      <p>cards in your hand, space separated</p>
+      <p><input name='my-cards' type='text'></p>
+
+      <p>the trump card</p>
+      <p><input name='trump-card' type='text'></p>
+
+      <p>number of players you are from the leader</p>
+      <p><input name='distance-from-leader' type='text'></p>
+
+      <p><input type='submit'></p>
+    </form>
+  </body>
+</html>
+
