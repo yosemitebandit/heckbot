@@ -12,17 +12,18 @@ def build_full_deck():
 def evaluate_trick(trick, leader_index, trump_suit):
   """Evaluate a trick and return the index of the winning card."""
   # Check first for trump.
-  trump_cards = [card for card in trick if trump_suit in card]
-  if len(trump_cards) == 1:
-    winning_card = trump_cards[0]
-  elif len(trump_cards) > 1:
-    trump_values = [c[:-1] for c in trump_cards]
-    indices = [all_values.index(v) for v in trump_values]
-    sorted_cards = sorted(zip(trump_values, indices), key=lambda v: v[1])
-    winning_value = sorted_cards[-1][0]
-    winning_card = (winning_value + trump_suit).upper()
+  if trump_suit:
+    trump_cards = [card for card in trick if trump_suit in card]
+    if len(trump_cards) == 1:
+      winning_card = trump_cards[0]
+    elif len(trump_cards) > 1:
+      trump_values = [c[:-1] for c in trump_cards]
+      indices = [all_values.index(v) for v in trump_values]
+      sorted_cards = sorted(zip(trump_values, indices), key=lambda v: v[1])
+      winning_value = sorted_cards[-1][0]
+      winning_card = (winning_value + trump_suit).upper()
   # No trump present.
-  else:
+  if not trump_suit or not trump_cards:
     suit_lead = trick[leader_index][-1]
     suited_cards = [card for card in trick if suit_lead in card]
     if len(suited_cards) == 1:

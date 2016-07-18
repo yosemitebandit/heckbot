@@ -7,7 +7,6 @@ Usage:
 
 Todo:
  * don't play randomly :|
- * remember first hand has no trump
  * multi-deck
 """
 
@@ -28,7 +27,13 @@ else:
   my_cards = [c.upper() for c in raw_input('your cards?\n').split(' ')]
   trump_card = raw_input('trump card?\n').upper()
   my_distance_from_leader = int(raw_input('distance from leader?\n'))
-trump_suit = trump_card[-1]
+
+
+# Find the trump suit..if there is one.
+if trump_card:
+  trump_suit = trump_card[-1]
+else:
+  trump_suit = None
 
 
 # Build the rest of the deck.
