@@ -119,7 +119,7 @@ while True:
   iterations += 1
   if iterations % 100 == 0:
     current_average_tricks_won = float(total_tricks_won) / iterations
-    delta =  abs(previous_average_tricks_won - current_average_tricks_won)
+    delta = abs(previous_average_tricks_won - current_average_tricks_won)
     if delta < 1e-5:
       break
     previous_average_tricks_won = float(total_tricks_won) / iterations
