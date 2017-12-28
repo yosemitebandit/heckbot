@@ -5,9 +5,13 @@ Usage:
   python play.py <number_of_players> <my_cards> <trump_card>
                  <distance_from_leader>
 
+Examples:
+  python play.py 5 "5s jh ah 6d 2s" jd 2
+
 Todo:
  * don't play randomly :|
  * multi-deck
+ * consider the bids of other players
 """
 
 import random
