@@ -7,6 +7,7 @@ Usage:
 
 Examples:
   python play.py 5 "5s jh ah 6d 2s" jd 2
+  python play.py 5 "3h 4h 5h 6h 7h 8h 9h 10h" "" 2
 
 Todo:
  * don't play randomly :|
